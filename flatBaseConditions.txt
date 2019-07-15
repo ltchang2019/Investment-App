@@ -1,0 +1,14 @@
+- find relative high from past
+  - check to make sure ongoing correction is no more than 15%
+  - set buy point to 10 cents higher than past relative high
+    - if high is exceeded in less than four weeks don't buy
+- if relative high is in process of forming then keep updating
+  - if price exceeds high set new high
+  - if price drops below high keep current high
+  - repeat updates until proper high is found
+
+- no more than 15% correction
+- 5 to 8 week long period
+
+- buy enough of stock where total value is around $5000
+- if stock decreases by more than 7 or 8% sell

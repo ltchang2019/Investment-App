@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>
+    <head>
+        <title>IBD 50 Query</title>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="bs/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="bs/angular.min.js"></script>
+        <script type="text/javascript" src="bs/xlsx.full.min.js"></script>
+        <script type="text/javascript" src="bs/customjs.js"></script>
+
+        <script>
+          function httpGetAsync(theUrl, callbackWhenPageLoaded) {
+              var xmlHttp = new XMLHttpRequest();
+              xmlHttp.onreadystatechange = function() {
+                  if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callbackWhenPageLoaded(xmlHttp.responseText);
+                  }
+              xmlHttp.open("GET", theUrl, true);
+              xmlHttp.send(null);
+          }
+
+          function enterSymbols(){
+            var url = "Symbols.php"
+            var symbolArray = document.getElementById("arrayList").innerHTML;
+            url += "?symbolArray=" + symbolArray;
+
+            httpGetAsync(url, submitSymbols)
+        }
+
+        function submitSymbols(responseText) {
+              document.getElementById("responseBox").innerHTML = responseText;
+          }
+
+
+        </script>
+
+        <style type="text/css">
+          table, th, td{
+            border: 1px solid black;
+          }
+        </style>
+
+    </head>
+
+    <body ng-controller = 'MyController'>
+      <div>
+        <form enctype="multipart/form-data">
+          <input type="file" id="file">
+          <button type="submit" value="submit" ng-click="uploadExcel()">Upload File</button>
+        </form>
+      </div>
+      <div>
+        <table id="myTable">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Company Name</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+      <div id="arrayList"></div>
+      <div id="responseBox"></div>
+
+    </body>
+
+</html>
