@@ -13,10 +13,14 @@ html = urlopen(req, context=ctx).read()
 # html = urllib.request.urlopen(url, context=ctx).read()
 soup = BeautifulSoup(html, 'html.parser')
 
+symbolList = list()
 tags =  soup('a')
 for tag in tags:
     possibleSymbol = tag.get('href', None)
     if possibleSymbol is None:
         continue
     elif possibleSymbol.find('/companies/') >=0 and tag.string.find(possibleSymbol[11:len(possibleSymbol)]) != -1:
-        print(possibleSymbol[11:len(possibleSymbol)])
+        if possibleSymbol[11:len(possibleSymbol)] != "FFTY":
+            symbolList.append(possibleSymbol[11:len(possibleSymbol)])
+
+print(symbolList)

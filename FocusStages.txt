@@ -1,0 +1,34 @@
+AUTO INVEST
+- App that automatically invests in and sells stocks with transferred funds using CAN SLIM model
+- Could query data from IBD?
+- Create stock lists based on minimum rating and data standards
+- Different program to track charts of stocks and detect buy points and patterns
+- take profits as percentage of profits from each transaction
+- Like Acorns on steroids
+- What would large scale economic impacts be if an app like this became mainstream?*
+
+Implementation Ideas:
+S1
+- Develop prototype which queries data from IBD (lot like Tesla creating Roadster prototype from Lotus lol)
+- Query information from IBD 50 List
+    - Get stock symbols from <tr> sets
+    - Search ChartAnalysis class for buy point info (use keywords and order?)
+- Once stock reaches described buy point or is within 5% of buy point (after buy point is reached), buy stock automatically
+- Follow 8% Rule if stock drops under buy price
+- Could use ChartAnalysis again for selling or could figure something else out
+
+S2
+- Automatically download IBD 50 in excel sheet daily using export url
+- Use javascript and Jquery to traverse top 50 stocks list in excel online
+- Figure out how to access stock charts and read patterns of each IBD 50 stock using code
+    - start with flat base
+    - Then make maybe move to cup with handle
+
+S3
+- Focus on tracking the price of one stock first
+- Don’t worry about entering IBD 50 List just try to do pattern detection given the symbol of stock
+
+S4 (7/15/19):
+- Now you can access IBD 25 and stocks hitting new highs
+- Most of the IBD 25 are around 52 week highs anyways so search for relative highs within past 4-6 weeks
+- after finding relative high focus on checking for correction no more than 15% and set buy point to relative high + 10 cents
