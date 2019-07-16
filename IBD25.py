@@ -22,5 +22,3 @@ for tag in tags:
     elif possibleSymbol.find('/companies/') >=0 and tag.string.find(possibleSymbol[11:len(possibleSymbol)]) != -1:
         if possibleSymbol[11:len(possibleSymbol)] != "FFTY":
             symbolList.append(possibleSymbol[11:len(possibleSymbol)])
-
-print(symbolList)
