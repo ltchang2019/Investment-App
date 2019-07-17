@@ -13,6 +13,8 @@ html = urlopen(req, context=ctx).read()
 # html = urllib.request.urlopen(url, context=ctx).read()
 soup = BeautifulSoup(html, 'html.parser')
 
+print("Retrieving IBD25...")
+
 symbolList = list()
 tags =  soup('a')
 for tag in tags:
@@ -22,3 +24,5 @@ for tag in tags:
     elif possibleSymbol.find('/companies/') >=0 and tag.string.find(possibleSymbol[11:len(possibleSymbol)]) != -1:
         if possibleSymbol[11:len(possibleSymbol)] != "FFTY":
             symbolList.append(possibleSymbol[11:len(possibleSymbol)])
+
+print(symbolList, "\n")

@@ -1,6 +1,8 @@
 from datetime import date
 today = date.today()
 
+print("Retrieving date range...")
+
 todayDate = today.strftime("%m/%d/%Y")
 
 todayList = list(todayDate)
@@ -21,4 +23,4 @@ else:
 
 startDate = "".join(todayList)
 
-# print(startDate, todayDate)
+print(startDate, "-", todayDate, "\n")
