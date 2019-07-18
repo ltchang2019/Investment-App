@@ -1,8 +1,4 @@
-from yahoo_fin import stock_info as si
-from IBD25 import symbolList
+from yahoo_finance import Share
 
-counter = 0
-for stock in symbolList:
-    price = si.get_live_price(stock)
-    print(symbolList[counter], price)
-    counter = counter + 1
+yahoo = Share('YHOO')
+print(yahoo.get_price())
