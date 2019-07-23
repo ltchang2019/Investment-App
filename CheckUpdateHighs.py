@@ -1,6 +1,6 @@
 from yahoo_fin.stock_info import *
 from yahoo_fin import stock_info as si
-from IBD25RelativeHighs import StockHighDateList
+from SQLSelectTest import getRelativeHigh, getDate
 from IBD25 import symbolList
 from datetime import datetime
 from GetDateRange import todayDate
@@ -9,8 +9,6 @@ from bs4 import BeautifulSoup
 import ssl
 from urllib.request import Request, urlopen
 from sendSMS import sendMessage
-
-#RELATIVE HIGH STORAGE
 
 def getIntradayHigh(symbol):
     ctx = ssl.create_default_context()
@@ -34,20 +32,25 @@ listOfNewHighs = list()
 def compareHighs():
     print("Retrieving new highs and condition details...")
     for stock in symbolList:
-        for tup in StockHighDateList:
-            if tup[0] == stock:
-                if stock == "KL.TO":
-                    stock = "KL"
-                price = si.get_live_price(stock)
-                if price > tup[1]:
-                    listOfNewHighs.append(stock)
-                    highDifference = price - tup[1]
-                    highDifference = "%.2f" % round(highDifference,2)
-                    print(stock, " new high detected at $", "%.2f" % round(price,2), sep="")
-                    print("Up by $", highDifference, sep="")
-                    print("Correction: ", checkCorrectionPercentage(stock, tup[2], tup[1]), "%", sep='')
-                    print(daysBetween(tup[2], todayDate), "days since last high.")
-                    sendMessage(stock, "%.2f" % round(price,2), daysBetween(tup[2], todayDate), checkCorrectionPercentage(stock, tup[2], tup[1]), highDifference)
+        relativeHigh = getRelativeHigh(stock)
+        price = getLivePrice(stock)
+        date = getDate(stock)
+        if price > relativeHigh:
+            listOfNewHighs.append(stock)
+            highDifference = price - relativeHigh
+            highDifference = "%.2f" % round(highDifference,2)
+            print(stock, " new high detected at $", "%.2f" % round(price,2), sep="")
+            print("Up by $", highDifference, sep="")
+            print("Correction: ", checkCorrectionPercentage(stock, date, relativeHigh), "%", sep='')
+            print(daysBetween(date, todayDate), "days since last high.")
+            sendMessage(stock, "%.2f" % round(price,2), daysBetween(date, todayDate), checkCorrectionPercentage(stock, date, relativeHigh), highDifference)
+
+def getLivePrice(stock):
+    if stock == "KL.TO":
+        stock = "KL"
+    price = si.get_live_price(stock)
+    return(price)
+
 
 def daysBetween(d1, d2):
     d1 = datetime.strptime(d1, "%m/%d/%Y")
