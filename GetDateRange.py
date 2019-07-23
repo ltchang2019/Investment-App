@@ -9,7 +9,7 @@ todayList = list(todayDate)
 
 if todayList[0] == "0":
     monthInt = int(todayList[1])
-    monthInt = monthInt - 3
+    monthInt = monthInt - 4
     if monthInt < 0:
         monthInt = 12 - monthInt
         todayList[0:2] = str(monthInt)

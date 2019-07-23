@@ -32,3 +32,6 @@ S4 (7/15/19):
 - Now you can access IBD 25 and stocks hitting new highs
 - Most of the IBD 25 are around 52 week highs anyways so search for relative highs within past 4-6 weeks
 - after finding relative high focus on checking for correction no more than 15% and set buy point to relative high + 10 cents
+
+S5:
+- GET CURRENT PROGRAM TO SEND YOU NOTIFICATIONS FOR NEW HIGHS; YOU MAKE BUY DECISIONS STILL AND TEST OVER NEXT FEW MONTHS TO SEE IF PROJECT IS JUSTIFIED BY RETURNS

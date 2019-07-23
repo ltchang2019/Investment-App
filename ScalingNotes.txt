@@ -1,0 +1,21 @@
+Additions Needing to Be Made:
+- Major Changes:
+  - adding relative highs into PHP database and adding in buy point 10 cents above relative high (compare intraday highs to that value)
+  - Offsetting actual trade notification to a day after actual breakout day; exclude current day from relative high calculations, then check for new high at end of day; signal for program to check new high stock's closing volume at end of day (+40% over 50 MA volume); then if all other conditions are fulfilled (correction %, duration, etc) then send notification to buy for next morning
+- Minor Technical Changes:
+  - detecting whether or not you are reaching 4+ stage base
+  - add indicator for how tight prices are closing to check tightness of overall pattern (maybe create formula to indicate tightness of base based on differences in consecutive closing prices?)
+
+Additions To Be Made With Access to College Resources:
+- accessing relative intraday volume (maybe asking professors or companies about getting access to intraday data online?)
+
+General Notes:
+- seems that almost every pattern is some variation of a flat base... cup handles, high tight flags, square boxes, double bottoms, etc...
+- FFTY fund far outperformed S&P 500; 104% return vs 50% return between bull period of 2016 to 2018; 38% vs 25% return on 2019 bull market
+- Checklist of Required Characteristics:
+  - price breakout
+  - high volume breakout
+  - tight pattern (especially in base portion)
+  - limited correction
+  - prior +30% price growth (already given in IBD 50?)
+  - if past three weeks had tight closing prices and small high low ranges, can count as 3 weeks tight instead of flat base

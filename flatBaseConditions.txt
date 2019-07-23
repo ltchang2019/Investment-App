@@ -8,7 +8,9 @@
   - repeat updates until proper high is found
 
 - no more than 15% correction
-- 5 to 8 week long period
+- 4 to 8 week long period
+- duration of base doesn't include initial high or breakout weeks so technically there should be duration of at least 42 days to make 4 week base
+
 
 - buy enough of stock where total value is around $5000
 - if stock decreases by more than 7 or 8% sell

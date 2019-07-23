@@ -8,6 +8,9 @@ import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
 import ssl
 from urllib.request import Request, urlopen
+from sendSMS import sendMessage
+
+#RELATIVE HIGH STORAGE
 
 def getIntradayHigh(symbol):
     ctx = ssl.create_default_context()
@@ -35,22 +38,26 @@ def compareHighs():
             if tup[0] == stock:
                 if stock == "KL.TO":
                     stock = "KL"
-                price = float(getIntradayHigh(stock))
+                price = si.get_live_price(stock)
                 if price > tup[1]:
                     listOfNewHighs.append(stock)
-                    print(stock, " new high detected at $", price, sep="")
-                    checkCorrectionPercentage(stock, tup[2], tup[1])
-                    daysBetween(tup[2], todayDate)
+                    highDifference = price - tup[1]
+                    highDifference = "%.2f" % round(highDifference,2)
+                    print(stock, " new high detected at $", "%.2f" % round(price,2), sep="")
+                    print("Up by $", highDifference, sep="")
+                    print("Correction: ", checkCorrectionPercentage(stock, tup[2], tup[1]), "%", sep='')
+                    print(daysBetween(tup[2], todayDate), "days since last high.")
+                    sendMessage(stock, "%.2f" % round(price,2), daysBetween(tup[2], todayDate), checkCorrectionPercentage(stock, tup[2], tup[1]), highDifference)
 
 def daysBetween(d1, d2):
     d1 = datetime.strptime(d1, "%m/%d/%Y")
     d2 = datetime.strptime(d2, "%m/%d/%Y")
     difference = abs((d2 - d1).days)
-    print((difference), "days since last high.")
+    return difference
     checkLength(difference)
 
-def checkLength(difference):
-    if(difference>=35):
+def checkLength(dayDifference):
+    if(dayDifference>=42):
         print("Viable flat base length. Check volume % change...")
     else:
         print("Too short for viable base pattern.\n")
@@ -62,8 +69,9 @@ def checkCorrectionPercentage(stock, oldHighDate, high):
         rangeLow = rangeLow['low']
         percentageDifference = ((high - rangeLow)/high) * 100
         percentageDifference = "%.2f" % round(percentageDifference,2)
-        print("Correction: ", percentageDifference, "%", sep='')
+        return percentageDifference
 
 compareHighs()
 
-#NEXT STEP IS TO CHECK FOR VOLUME SPIKES (40-50%)
+#STORE RELATIVE HIGHS IN NUMPY VARIABLES SO YOU DON'T HAVE TO QUERY THEM EVERY TIME
+#ALSO STORE LIST OF WHICH STOCKS HAVE ALREADY HAD +10 CENTS HIGH SO YOU DON'T KEEP RESENDING NOTIFICATIONS
