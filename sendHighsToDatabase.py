@@ -8,12 +8,16 @@ mysql = mysql.connector.connect(
     database = "Investment Program"
 )
 
-mycursor = mysql.cursor()
-sql = "Insert into RelativeHighList(Symbol, Price, Date) values (%s, %s, %s)"
-
-for tup in StockHighDateList:
-    val = (tup[0], tup[1], tup[2])
-    mycursor.execute(sql, val)
+def sendNewInfo():
+    mycursor = mysql.cursor()
+    truncateSQL = "TRUNCATE TABLE RelativeHighList"
+    mycursor.execute(truncateSQL)
     mysql.commit()
 
-print("Data submitted")
+    sql = "INSERT INTO RelativeHighList (Symbol, Price, Date) VALUES (%s, %s, %s)"
+
+    for tup in StockHighDateList:
+        mycursor.execute(sql, (tup[0], tup[1], tup[2]))
+        mysql.commit()
+
+    print("Data submitted!")

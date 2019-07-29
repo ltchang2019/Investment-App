@@ -1,4 +1,5 @@
-from yahoo_finance import Share
+from yahoo_fin.stock_info import *
+from yahoo_fin import stock_info as si
 
-yahoo = Share('YHOO')
-print(yahoo.get_price())
+price = si.get_live_price("ESNT")
+print(price)

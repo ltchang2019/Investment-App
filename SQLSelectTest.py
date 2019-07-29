@@ -10,10 +10,8 @@ try:
     database = "Investment Program"
 )
 
-
 except Error as e :
     print ("Error while connecting to MySQL", e)
-
 
 def getRelativeHigh(stock):
    mycursor = mysql.cursor()

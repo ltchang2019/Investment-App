@@ -9,6 +9,18 @@ from bs4 import BeautifulSoup
 import ssl
 from urllib.request import Request, urlopen
 from sendSMS import sendMessage
+import mysql.connector
+from sendHighsToDatabase import sendNewInfo
+import schedule
+import time
+
+
+mysql = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "",
+    database = "Investment Program"
+)
 
 def getIntradayHigh(symbol):
     ctx = ssl.create_default_context()
@@ -74,7 +86,18 @@ def checkCorrectionPercentage(stock, oldHighDate, high):
         percentageDifference = "%.2f" % round(percentageDifference,2)
         return percentageDifference
 
-compareHighs()
 
-#STORE RELATIVE HIGHS IN NUMPY VARIABLES SO YOU DON'T HAVE TO QUERY THEM EVERY TIME
-#ALSO STORE LIST OF WHICH STOCKS HAVE ALREADY HAD +10 CENTS HIGH SO YOU DON'T KEEP RESENDING NOTIFICATIONS
+def startChecks():
+    schedule.every(1).minutes.do(compareHighs)
+
+def sleep():
+    schedule.cancel_job(startChecks)
+    time.sleep(43200)
+
+schedule.every().day.at("06:25").do(sendNewInfo)
+schedule.every().day.at("06:29").do(startChecks)
+schedule.every().day.at("13:00").do(sleep)
+
+while 1:
+    schedule.run_pending()
+    time.sleep(1)
