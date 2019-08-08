@@ -35,3 +35,6 @@ S4 (7/15/19):
 
 S5:
 - GET CURRENT PROGRAM TO SEND YOU NOTIFICATIONS FOR NEW HIGHS; YOU MAKE BUY DECISIONS STILL AND TEST OVER NEXT FEW MONTHS TO SEE IF PROJECT IS JUSTIFIED BY RETURNS
+
+S6:
+- add new database table for checking what new highs over 10 cents have already been reported (so you don't keep sending messages for same stock)

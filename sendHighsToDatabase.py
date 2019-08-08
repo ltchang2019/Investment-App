@@ -21,3 +21,5 @@ def sendNewInfo():
         mysql.commit()
 
     print("Data submitted!")
+
+# sendNewInfo()

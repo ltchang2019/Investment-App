@@ -40,6 +40,9 @@ def getIntradayHigh(symbol):
         elif tagID.find('TodaysHigh') >=0:
             return tag.string
 
+# LIST OF NEW HIGH STOCKS ALREADY SENT
+alreadySentList = list()
+
 listOfNewHighs = list()
 def compareHighs():
     print("Retrieving new highs and condition details...")
@@ -55,13 +58,16 @@ def compareHighs():
             print("Up by $", highDifference, sep="")
             print("Correction: ", checkCorrectionPercentage(stock, date, relativeHigh), "%", sep='')
             print(daysBetween(date, todayDate), "days since last high.")
-            sendMessage(stock, "%.2f" % round(price,2), daysBetween(date, todayDate), checkCorrectionPercentage(stock, date, relativeHigh), highDifference)
+
+            if stock not in alreadySentList:
+                sendMessage(stock, "%.2f" % round(price,2), daysBetween(date, todayDate), checkCorrectionPercentage(stock, date, relativeHigh), highDifference)
+                alreadySentList.append(stock)
 
 def getLivePrice(stock):
     if stock == "KL.TO":
         stock = "KL"
     price = si.get_live_price(stock)
-    return(price)
+    return price
 
 
 def daysBetween(d1, d2):
@@ -86,17 +92,18 @@ def checkCorrectionPercentage(stock, oldHighDate, high):
         percentageDifference = "%.2f" % round(percentageDifference,2)
         return percentageDifference
 
-
-def startChecks():
-    schedule.every(1).minutes.do(compareHighs)
-
-def sleep():
-    schedule.cancel_job(startChecks)
-    time.sleep(43200)
-
-schedule.every().day.at("06:25").do(sendNewInfo)
-schedule.every().day.at("06:29").do(startChecks)
-schedule.every().day.at("13:00").do(sleep)
+sendNewInfo()
+schedule.every(3).minutes.do(compareHighs)
+# def startChecks():
+#     schedule.every(3).minutes.do(compareHighs)
+#
+# def sleep():
+#     schedule.cancel_job(startChecks)
+#     time.sleep(43200)
+#
+# schedule.every().day.at("06:28").do(sendNewInfo)
+# schedule.every().day.at("06:35").do(startChecks)
+# schedule.every().day.at("13:00").do(sleep)
 
 while 1:
     schedule.run_pending()
