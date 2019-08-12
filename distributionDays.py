@@ -62,7 +62,7 @@ def checkOldestDay():
     sql = "SELECT Date FROM DistributionDays ORDER BY keyIndex ASC LIMIT 1"
     mycursor.execute(sql)
     oldDate = mycursor.fetchall()[0][0]
-    print(oldDate)
+    print(oldDate, "last distribution day")
 
     if daysBetween(oldDate, today) >= 35:
         mycursor = mysql.cursor()
