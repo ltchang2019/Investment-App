@@ -19,3 +19,14 @@ General Notes:
   - limited correction
   - prior +30% price growth (already given in IBD 50?)
   - if past three weeks had tight closing prices and small high low ranges, can count as 3 weeks tight instead of flat base
+
+Overview:
+- Bull Market:
+  - detect flat base breakouts
+  - look for distribution days and sell off at 4
+- Downturn:
+  - check for accumulation days and follow through days
+  - take quarter position upon follow through day buying strong stocks with minimal declines during correction AND breaking out of flat bases
+  - once market increases by certain percentage, invest rest in new stocks breaking out of bases or back into successful initial investments
+
+MAIN FOCUS NOW IS DETECTING STOCKS WITHIN BUY RANGE THAT HAVE ALREADY BROKEN OUT
