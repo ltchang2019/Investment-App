@@ -1,9 +1,9 @@
 from yahoo_fin.stock_info import *
 from yahoo_fin import stock_info as si
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import mysql.connector
-from GetDateRangeCopy import todayDate
+from GetDateRangeCopy import todayDate, prevWeekday
 
 mysql = mysql.connector.connect(
     host = "localhost",
@@ -17,10 +17,10 @@ sp500 = "^IXIC"
 
 def checkForDistributionDay():
     # GET CURRENT AND YESTERDAY'S S&P 500 PRICES
-    currSP500 = get_data(sp500, start_date = todayDate, end_date = datetime.strptime(todayDate, "%m/%d/%Y") + relativedelta(days=+1))
+    currSP500 = get_data(sp500, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
     currSP500Price = currSP500.loc[currSP500['close'].idxmax()]['close']
     currSP500Volume = currSP500.loc[currSP500['volume'].idxmax()]['volume']
-    pastSP500 = get_data(sp500, start_date = datetime.strptime(todayDate, "%m/%d/%Y") + relativedelta(days=-1), end_date = todayDate)
+    pastSP500 = get_data(sp500, start_date = prevWeekday, end_date = todayDate)
     pastSP500Price = pastSP500.loc[pastSP500['close'].idxmax()]['close']
     pastSP500Volume = pastSP500.loc[pastSP500['volume'].idxmax()]['volume']
 
@@ -62,7 +62,7 @@ def checkOldestDay():
         oldDate = mycursor.fetchall()[0][0]
         print(oldDate, "last distribution day")
         # if there is at least one distribution day check if it has been on list long enough to remove from count
-        if daysBetween(oldDate, todayDate) >= 35:
+        if daysBetween(datetime.strptime(oldDate, "%Y-%m-%d").date(), todayDate) >= 35:
             removeSQL = "DELETE FROM NasdaqDistributionDays WHERE Date = %s"
             mycursor.execute(removeSQL, (oldDate,))
             mysql.commit()
@@ -71,10 +71,8 @@ def checkOldestDay():
         print("No distribution days in table")
 
 
-def daysBetween(oldDate, todayDate):
-    oldDate = datetime.strptime(oldDate, "%m/%d/%Y")
-    todayDate = datetime.strptime(todayDate, "%m/%d/%Y")
-    difference = abs((todayDate - oldDate).days)
+def daysBetween(d1, d2):
+    difference = abs((d2 - d1).days)
     return difference
 
 checkForDistributionDay()

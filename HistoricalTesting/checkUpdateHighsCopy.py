@@ -2,7 +2,7 @@ from yahoo_fin.stock_info import *
 from yahoo_fin import stock_info as si
 from SQLSelectTestCopy import getRelativeHigh, getDate
 from IBD25Copy import symbolList
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from GetDateRangeCopy import todayDate
 import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
@@ -50,8 +50,8 @@ def compareHighs():
     for stock in symbolList:
         relativeHigh = getRelativeHigh(stock)
         price = getLivePrice(stock)
-        date = getDate(stock)
-        # if curr price breaks out of relative high, check days between, correction percentage, and maybe volume
+        date = datetime.strptime(getDate(stock), "%Y-%m-%d").date()
+        # if curr price breaks out of relative high, check days between highs, correction percentage, and maybe volume
         if price > relativeHigh:
             listOfNewHighs.append(stock)
             highDifference = price - relativeHigh
@@ -65,29 +65,29 @@ def compareHighs():
                 # check correction and length for those with corrections less than 15% and at least 5 week long base
                 if checkCorrectionPercentage(stock, date, relativeHigh) < 15 and daysBetween(date, todayDate) > 35:
                     movingAverage = get50DayMA(stock, todayDate)
-                    currStock = get_data(stock, start_date = todayDate, end_date = datetime.strptime(todayDate, "%m/%d/%Y") + relativedelta(days=+1))
+                    currStock = get_data(stock, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
                     currVolume = currStock.loc[currStock['volume'].idxmax()]['volume']
                     volumeSpike = (currVolume - movingAverage)/currVolume
                     if volumeSpike > .4:
-                        print(volumeSpike)
+                        print("Volume spike: " + str(volumeSpike))
                         print("BUY SIGNAL")
+                        print(price)
+                    else:
+                        print(volumeSpike, "not enough")
             print("\n")
 
 def getLivePrice(stock):
     if stock == "KL.TO":
         stock = "KL"
-    currStock = get_data(stock, start_date = todayDate, end_date = datetime.strptime(todayDate, "%m/%d/%Y") + relativedelta(days=+1))
+    currStock = get_data(stock, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
     currStockIntradayHigh = currStock.loc[currStock['high'].idxmax()]['high']
 
     return currStockIntradayHigh
 
 
 def daysBetween(d1, d2):
-    d1 = datetime.strptime(d1, "%m/%d/%Y")
-    d2 = datetime.strptime(d2, "%m/%d/%Y")
     difference = abs((d2 - d1).days)
     return difference
-
 
 def checkCorrectionPercentage(stock, oldHighDate, high):
         oldToNewHighRange = get_data(stock , start_date = oldHighDate, end_date = todayDate)

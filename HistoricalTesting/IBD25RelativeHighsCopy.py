@@ -13,8 +13,7 @@ for stock in symbolList:
     highPriceData = rangeData.loc[rangeData['high'].idxmax()]
 
     highDate = highPriceData.name
-    reformattedDate = highDate.strftime('%m/%d/%Y')
-    StockHighDateList.append(tuple(((highPriceData['ticker'], highPriceData['high'], reformattedDate))))
+    StockHighDateList.append(tuple(((highPriceData['ticker'], highPriceData['high'], highDate))))
 
 print(StockHighDateList, "\n")
 #creates list of all stocks data with format: (symbol, high, date)

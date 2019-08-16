@@ -1,15 +1,17 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 print("Retrieving date range...")
 
-todayDate = "2018-01-04"
+def prev_weekday(adate):
+    adate -= timedelta(days=1)
+    while adate.weekday() > 4:
+        adate -= timedelta(days=1)
+    return adate
+
+todayDate = "2018-01-12"
 todayDate = datetime.strptime(todayDate, "%Y-%m-%d").date()
-
-
 startDate = todayDate + relativedelta(months=-3)
-startDate = startDate.strftime("%m/%d/%Y")
-todayDate = todayDate.strftime("%m/%d/%Y")
-
+prevWeekday = prev_weekday(todayDate)
 
 print(startDate, "-", todayDate, "\n")

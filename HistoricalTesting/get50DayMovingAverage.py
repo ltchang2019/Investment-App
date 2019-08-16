@@ -6,7 +6,7 @@ import mysql.connector
 
 
 def get50DayMA(stock, todayDate):
-    stockInfo = get_data(stock, start_date = datetime.strptime(todayDate, "%m/%d/%Y") + relativedelta(days=-70), end_date = todayDate)
+    stockInfo = get_data(stock, start_date = todayDate + relativedelta(days=-70), end_date = todayDate)
     total = stockInfo['volume'].sum()
     average = total/50
     return average
