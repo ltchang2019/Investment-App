@@ -29,4 +29,5 @@ Overview:
   - take quarter position upon follow through day buying strong stocks with minimal declines during correction AND breaking out of flat bases
   - once market increases by certain percentage, invest rest in new stocks breaking out of bases or back into successful initial investments
 
-MAIN FOCUS NOW IS DETECTING STOCKS WITHIN BUY RANGE THAT HAVE ALREADY BROKEN OUT
+- CREATE OVERARCHING DOCUMENT WITH DIFFERENT MARKET STATES WHICH DETERMINES WHAT OTHER DOCUMENTS ARE RUN
+- LASTLY FIND A WAY TO RUN YOUR CODE USING HISTORICAL DATA AND TRACK MISTAKES MADE BY PROGRAM
