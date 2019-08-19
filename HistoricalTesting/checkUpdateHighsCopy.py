@@ -15,6 +15,7 @@ import schedule
 import time
 from dateutil.relativedelta import relativedelta
 from get50DayMovingAverage import get50DayMA
+from buyStockCopy import buyStock
 
 mysql = mysql.connector.connect(
     host = "localhost",
@@ -72,6 +73,7 @@ def compareHighs():
                         print("Volume spike: " + str(volumeSpike))
                         print("BUY SIGNAL")
                         print(price)
+                        buyStock(stock, price, todayDate)
                     else:
                         print(volumeSpike, "not enough")
             print("\n")
