@@ -3,7 +3,7 @@ from yahoo_fin import stock_info as si
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import mysql.connector
-from GetDateRangeCopy import todayDate, prevWeekday
+# from GetDateRangeCopy import todayDate, prevWeekday
 
 mysql = mysql.connector.connect(
     host = "localhost",
@@ -17,24 +17,23 @@ sp500 = "^IXIC"
 # 1st Day: index closes above last session's price
 # 2nd & 3rd Days: low of 1st day is not undercut by new closes
 # 4th day (follow through): index closes more than 1% above previous session on high volume
+def getNasdaqData(todayDate, prevWeekday):
+    getNasdaqData.todayDate = todayDate
+    todayDate = getNasdaqData.todayDate
 
-currSP500 = get_data(sp500, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
-currSP500Close = currSP500.loc[currSP500['close'].idxmax()]['close']
-currSP500Low = currSP500.loc[currSP500['low'].idxmax()]['low']
-currSP500Volume = currSP500.loc[currSP500['volume'].idxmax()]['volume']
+    getNasdaqData.currSP500 = get_data(sp500, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
+    currSP500 = getNasdaqData.currSP500
+    getNasdaqData.currSP500Close = currSP500.loc[currSP500['close'].idxmax()]['close']
+    getNasdaqData.currSP500Low = currSP500.loc[currSP500['low'].idxmax()]['low']
+    getNasdaqData.currSP500Volume = currSP500.loc[currSP500['volume'].idxmax()]['volume']
 
-pastSP500 = get_data(sp500, start_date = prevWeekday, end_date = todayDate)
-pastSP500Close = pastSP500.loc[pastSP500['close'].idxmax()]['close']
-pastSP500Volume= pastSP500.loc[pastSP500['volume'].idxmax()]['volume']
+    getNasdaqData.pastSP500 = get_data(sp500, start_date = prevWeekday, end_date = todayDate)
+    pastSP500 = getNasdaqData.pastSP500
+    getNasdaqData.pastSP500Close = pastSP500.loc[pastSP500['close'].idxmax()]['close']
+    getNasdaqData.pastSP500Volume= pastSP500.loc[pastSP500['volume'].idxmax()]['volume']
 
-# currSP500Close = 2500
-# currSP500Low = 1800
-# currSP500Volume = 15000
-#
-# pastSP500Close = 2000
-# pastSP500Volume = 13000
 
-def startFunction():
+def startNasdaqFunction():
     sql = "SELECT * FROM NasdaqAccumulationDays"
     mycursor.execute(sql)
     result = mycursor.fetchall()
@@ -45,12 +44,12 @@ def startFunction():
 
 def addAccumulationDay():
     sql = "INSERT INTO NasdaqAccumulationDays (Date, close, low, volume) VALUES (%s, %s, %s, %s)"
-    mycursor.execute(sql, (todayDate, str(currSP500Close), str(currSP500Low), str(currSP500Volume)))
+    mycursor.execute(sql, (getNasdaqData.todayDate, str(getNasdaqData.currSP500Close), str(getNasdaqData.currSP500Low), str(getNasdaqData.currSP500Volume)))
     mysql.commit()
 
 # ONLY CALL IF TABLE EMPTY
 def firstDay():
-    if currSP500Close > pastSP500Close:
+    if getNasdaqData.currSP500Close > getNasdaqData.pastSP500Close:
         addAccumulationDay()
         print("First day entered")
     else:
@@ -63,13 +62,13 @@ def middleDays():
     result = mycursor.fetchall()
     firstClose = result[0][0]
     firstLow = result[0][1]
-    print(currSP500Close)
+    print(getNasdaqData.currSP500Close)
 
-    if currSP500Close > firstLow:
-         if (currSP500Close - pastSP500Close)/pastSP500Close < .0125:
+    if getNasdaqData.currSP500Close > firstLow:
+         if (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close <= .0125:
              addAccumulationDay()
              print("Middle day entered")
-         elif (currSP500Close - pastSP500Close)/pastSP500Close > .0125:
+         elif (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close >= .0125:
             # check that you have at least 3 accumulation days
             sql = "SELECT * FROM NasdaqAccumulationDays WHERE dayNumber = %s"
             mycursor.execute(sql, (3,))
@@ -80,16 +79,16 @@ def middleDays():
                 addAccumulationDay()
                 print("Haven't had 3rd rally day yet, another middle day added")
     else:
-        truncateNasdaqAccumulationDays = "TRUNCATE TABLE NasdaqAccumulationDays"
         truncateSP500AccumulationDays = "TRUNCATE TABLE SP500AccumulationDays"
-        mycursor.execute(truncateNasdaqAccumulationDays)
+        truncateNasdaqAccumulationDays = "TRUNCATE TABLE NasdaqAccumulationDays"
         mycursor.execute(truncateSP500AccumulationDays)
+        mycursor.execute(truncateNasdaqAccumulationDays)
         mysql.commit()
         print("Low undercut. Rally started over.")
 
 def followThroughDay():
-    if currSP500Volume > pastSP500Volume:
-        print("Follow through day")
+    if getNasdaqData.currSP500Volume > getNasdaqData.pastSP500Volume:
+        print("FOLLOW THROUGH DAY")
         truncateSP500AccumulationDays = "TRUNCATE TABLE SP500AccumulationDays"
         truncateNasdaqAccumulationDays = "TRUNCATE TABLE NasdaqAccumulationDays"
         mycursor.execute(truncateSP500AccumulationDays)
@@ -98,5 +97,3 @@ def followThroughDay():
     else:
         print("Follow through volume not satisfied")
         #truncate table, take quarter position signal
-
-startFunction()

@@ -21,7 +21,7 @@ oneDayAgo = prev_weekday(todayDate)
 
 dropDays = 0
 
-def emergencyCheck(theDay, pastDay):
+def checkTwoDays(theDay, pastDay):
     global dropDays
 
     currSP500 = get_data(sp500, start_date = theDay, end_date = theDay + relativedelta(days=+1))
@@ -30,14 +30,22 @@ def emergencyCheck(theDay, pastDay):
     pastSP500 = get_data(sp500, start_date = pastDay, end_date = theDay)
     pastSP500High = pastSP500.loc[pastSP500['high'].idxmax()]['high']
 
-    if (pastSP500High - currSP500Low)/pastSP500High >= .0195:
+    if (pastSP500High - currSP500Low)/pastSP500High >= .025:
         dropDays += 1
-        print(theDay)
 
-emergencyCheck(todayDate, oneDayAgo)
-emergencyCheck(oneDayAgo, twoDaysAgo)
-emergencyCheck(twoDaysAgo, threeDaysAgo)
-emergencyCheck(threeDaysAgo, fourDaysAgo)
+def emergencyCheck():
+    global dropDays
+    checkTwoDays(todayDate, oneDayAgo)
+    checkTwoDays(oneDayAgo, twoDaysAgo)
+    checkTwoDays(twoDaysAgo, threeDaysAgo)
+    checkTwoDays(threeDaysAgo, fourDaysAgo)
 
-if dropDays <= 2:
-    print("Emergency sell off")
+    if dropDays >= 2:
+        truncatePortfolio = "TRUNCATE TABLE portfolio"
+        truncateSP500Distribution = "TRUNCATE TABLE SP500DistributionDays"
+        truncateNasdaqDistribution = "TRUNCATE TABLE NasdaqDistributionDays"
+        mycursor.execute(truncatePortfolio)
+        mycursor.execute(truncateSP500Distribution)
+        mycursor.execute(truncateNasdaqDistribution)
+        mysql.commit()
+        print("EMERGENCY SELL OFF")
