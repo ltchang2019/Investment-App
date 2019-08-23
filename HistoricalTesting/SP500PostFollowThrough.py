@@ -3,7 +3,6 @@ from yahoo_fin import stock_info as si
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import mysql.connector
-from GetDateRangeCopy import todayDate, prevWeekday
 
 mysql = mysql.connector.connect(
     host = "localhost",
@@ -14,31 +13,66 @@ mysql = mysql.connector.connect(
 mycursor = mysql.cursor(buffered=True)
 sp500 = "^GSPC"
 
-currSP500 = get_data(sp500, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
-currSP500Close = currSP500.loc[currSP500['close'].idxmax()]['close']
+def getSP500Data(todayDate, prevWeekday):
+    getSP500Data.todayDate = todayDate
+    todayDate = getSP500Data.todayDate
 
-pastSP500 = get_data(sp500, start_date = prevWeekday, end_date = prevWeekday + relativedelta(days=+1))
-pastSP500Close = pastSP500.loc[pastSP500['close'].idxmax()]['close']
+    getSP500Data.currSP500 = get_data(sp500, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
+    currSP500 = getSP500Data.currSP500
+    getSP500Data.currSP500Close = currSP500.loc[currSP500['close'].idxmax()]['close']
 
-def checkForIncrease(daysUp):
-    percentageChange = (currSP500Close - pastSP500Close)/currSP500Close
+    getSP500Data.pastSP500 = get_data(sp500, start_date = prevWeekday, end_date = prevWeekday + relativedelta(days=+1))
+    pastSP500 = getSP500Data.pastSP500
+    getSP500Data.pastSP500Close = pastSP500.loc[pastSP500['close'].idxmax()]['close']
+
+def checkForIncrease(daysUp, daysDown):
+    percentageChange = (getSP500Data.currSP500Close - getSP500Data.pastSP500Close)/getSP500Data.currSP500Close
+    # sql = "SELECT * FROM SP500PostFollowThrough"
+    # mycursor.execute(sql)
     if percentageChange > 0:
-        sql = "INSERT INTO SP500PostFollowThrough (Date, percentChange) VALUES (%s, %s)"
-        mycursor.execute(sql, (todayDate, percentageChange))
+        sql = "INSERT INTO SP500PostFollowThrough (Date, percentChange, upOrDown) VALUES (%s, %s, %s)"
+        mycursor.execute(sql, (getSP500Data.todayDate, percentageChange, "increase"))
         mysql.commit()
         print("Increase day entered")
         if daysUp >= 1:
             print("MARKET IN CONFIRMED UPTREND")
-    else:
-        print("Decrease causes restart. Look for accumulation again.")
+            truncatePostFollowThroughTables()
+    elif percentageChange < 0:
+        sql = "INSERT INTO SP500PostFollowThrough (Date, percentChange, upOrDown) VALUES (%s, %s, %s)"
+        mycursor.execute(sql, (getSP500Data.todayDate, percentageChange, "decrease"))
+        mysql.commit()
+        if daysDown >= 1:
+            print("Second down day. Restart rally.")
+            truncatePostFollowThroughTables()
+        else:
+            print("First down day but hasn't been 3 days yet.")
 
 
-def countUpDays():
-    sql = "SELECT * FROM SP500PostFollowThrough"
+def countUpDaysSP500():
+    sql = "SELECT upOrDown FROM SP500PostFollowThrough"
     mycursor.execute(sql)
-    if mycursor.rowcount >= 2:
-        print("MARKET IN CONFIRMED UPTREND")
-    else:
-        checkForIncrease(mycursor.rowcount)
+    results = mycursor.fetchall()
+    upCounter = 0
+    downCounter = 0
+    for upDown in results:
+        if upDown[0] == "increase":
+            upCounter += 1
+        elif upDown[0] == "decrease":
+            downCounter += 1
 
-countUpDays()
+    if upCounter >= 2:
+        truncatePostFollowThroughTables()
+        print("2 of 3 days up. MARKET IN CONFIRMED UPTREND")
+    elif downCounter >= 2:
+        truncatePostFollowThroughTables()
+        print("2 of 3 days down. Restart rally.")
+    else:
+        checkForIncrease(upCounter, downCounter)
+        # condition: less than 2 up days and less than 2 down days
+
+def truncatePostFollowThroughTables():
+    truncateSP500PostFollowThrough = "TRUNCATE TABLE SP500PostFollowThrough"
+    truncateNasdaqPostFollowThrough = "TRUNCATE TABLE NasdaqPostFollowThrough"
+    mycursor.execute(truncateSP500PostFollowThrough)
+    mycursor.execute(truncateNasdaqPostFollowThrough)
+    mysql.commit()

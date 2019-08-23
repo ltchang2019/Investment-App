@@ -7,7 +7,7 @@ import time
 
 print("Retrieving date range...")
 global todayDate
-todayDate = "2019-06-21"
+todayDate = "2015-05-27"
 todayDate = datetime.strptime(todayDate, "%Y-%m-%d").date()
 
 def prev_weekday(adate):
