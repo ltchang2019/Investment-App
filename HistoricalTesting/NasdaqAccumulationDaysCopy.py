@@ -11,8 +11,7 @@ mysql = mysql.connector.connect(
     password = "",
     database = "HistoricalTesting"
 )
-mycursor = mysql.cursor()
-
+mycursor = mysql.cursor(buffered=True)
 sp500 = "^IXIC"
 # 1st Day: index closes above last session's price
 # 2nd & 3rd Days: low of 1st day is not undercut by new closes
@@ -65,10 +64,10 @@ def middleDays():
     print(getNasdaqData.currSP500Close)
 
     if getNasdaqData.currSP500Close > firstLow:
-         if (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close <= .0125:
+         if (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close <= .01:
              addAccumulationDay()
              print("Middle day entered")
-         elif (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close >= .0125:
+         elif (getNasdaqData.currSP500Close - getNasdaqData.pastSP500Close)/getNasdaqData.pastSP500Close >= .01:
             # check that you have at least 3 accumulation days
             sql = "SELECT * FROM NasdaqAccumulationDays WHERE dayNumber = %s"
             mycursor.execute(sql, (3,))
@@ -85,6 +84,23 @@ def middleDays():
         mycursor.execute(truncateNasdaqAccumulationDays)
         mysql.commit()
         print("Low undercut. Rally started over.")
+
+def resetNasdaqRally():
+    sql = "SELECT dayNumber FROM NasdaqAccumulationDays ORDER BY dayNumber DESC LIMIT 1"
+    mycursor.execute(sql)
+    if mycursor.rowcount > 0:
+        result = mycursor.fetchall()[0][0]
+        if result > 7:
+            print("7 days passed. RESET RALLY.")
+            truncateSP500AccumulationDays = "TRUNCATE TABLE SP500AccumulationDays"
+            truncateNasdaqAccumulationDays = "TRUNCATE TABLE NasdaqAccumulationDays"
+            mycursor.execute(truncateSP500AccumulationDays)
+            mycursor.execute(truncateNasdaqAccumulationDays)
+            mysql.commit()
+        else:
+            print("Rally at day", result)
+    else:
+        print("No entries in Nasdaq accumulation")
 
 def followThroughDay():
     if getNasdaqData.currSP500Volume > getNasdaqData.pastSP500Volume:

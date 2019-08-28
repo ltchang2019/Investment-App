@@ -34,9 +34,9 @@ def checkForIncrease(daysUp, daysDown):
         mycursor.execute(sql, (getSP500Data.todayDate, percentageChange, "increase"))
         mysql.commit()
         print("Increase day entered")
-        if daysUp >= 1:
-            print("MARKET IN CONFIRMED UPTREND")
-            truncatePostFollowThroughTables()
+        # if daysUp >= 1:
+        #     print("MARKET IN CONFIRMED UPTREND")
+        #     truncatePostFollowThroughTables()
     elif percentageChange < 0:
         sql = "INSERT INTO SP500PostFollowThrough (Date, percentChange, upOrDown) VALUES (%s, %s, %s)"
         mycursor.execute(sql, (getSP500Data.todayDate, percentageChange, "decrease"))
@@ -61,11 +61,11 @@ def countUpDaysSP500():
             downCounter += 1
 
     if upCounter >= 2:
-        truncatePostFollowThroughTables()
         print("2 of 3 days up. MARKET IN CONFIRMED UPTREND")
-    elif downCounter >= 2:
         truncatePostFollowThroughTables()
-        print("2 of 3 days down. Restart rally.")
+
+    elif downCounter >= 2:
+        print("2 of 3 days down. RESTART RALLY.")
     else:
         checkForIncrease(upCounter, downCounter)
         # condition: less than 2 up days and less than 2 down days

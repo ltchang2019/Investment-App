@@ -3,7 +3,7 @@ from yahoo_fin import stock_info as si
 from SQLSelectTestCopy import getRelativeHigh, getDate
 from IBD25Copy import symbolList
 from datetime import date, datetime, timedelta
-from GetDateRangeCopy import todayDate
+from GetDateRangeCopy import todayDate, prevWeekday
 import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
 import ssl
@@ -23,6 +23,7 @@ mysql = mysql.connector.connect(
     password = "",
     database = "HistoricalTesting"
 )
+mycursor = mysql.cursor(buffered=True)
 
 def getIntradayHigh(symbol):
     ctx = ssl.create_default_context()
@@ -45,9 +46,10 @@ def getIntradayHigh(symbol):
 # LIST OF NEW HIGH STOCKS ALREADY SENT
 alreadySentList = list()
 
+# NEED TO CREATE 5% BUY RANGE COLUMN
 listOfNewHighs = list()
 def compareHighs():
-    print("Retrieving new highs and condition details...")
+    print("\nRetrieving new highs and condition details...")
     for stock in symbolList:
         relativeHigh = getRelativeHigh(stock)
         price = getLivePrice(stock)
@@ -75,8 +77,47 @@ def compareHighs():
                         print(price)
                         buyStock(stock, price, todayDate)
                     else:
-                        print(volumeSpike, "not enough")
+                        addToBreakouts(stock, price, relativeHigh)
+                        print(volumeSpike, "percent not enough. Stock added to breakouts list.")
             print("\n")
+
+def addToBreakouts(stock, price, relativeHigh):
+    fivePercentAbove = price + (.05 * price)
+    buyPoint = relativeHigh + .1
+    sql = "INSERT INTO breakouts (symbol, buyPoint, fivePercentAbove) VALUES (%s, %s, %s)"
+    mycursor.execute(sql, (stock, buyPoint, fivePercentAbove))
+    mysql.commit()
+
+def checkBreakouts():
+    sql = "SELECT * FROM breakouts"
+    mycursor.execute(sql)
+    if mycursor.rowcount > 0:
+        results = mycursor.fetchall()
+        for row in results:
+            stock = row[0]
+            buyPoint = row[1]
+            fivePercentAbove = row[2]
+            currStock = get_data(stock, start_date = todayDate, end_date = todayDate + relativedelta(days=+1))
+            currPrice = currStock.loc[currStock['close'].idxmax()]['close']
+            currVolume = currStock.loc[currStock['volume'].idxmax()]['volume']
+            pastStock = get_data(stock, start_date = prevWeekday, end_date = prevWeekday + relativedelta(days=+1))
+            pastPrice = pastStock.loc[pastStock['close'].idxmax()]['close']
+
+            if currPrice > buyPoint and currPrice < fivePercentAbove and currPrice > pastPrice and currVolume > get50DayMA(stock, todayDate):
+                buyStock(stock, currPrice, todayDate)
+                sql = "DELETE FROM breakouts WHERE symbol = %s"
+                mycursor.execute(sql, (stock,))
+                mysql.commit()
+                print(stock, "BOUGHT FROM BREAKOUT LIST.")
+            else:
+                print(stock, "breakout conditions not met.")
+    else:
+        print("No items in breakout list.")
+
+    # CHECK FOR STRONG GAIN (AROUND .3%) AND +40% ABOVE AVERAGE VOLUME
+    # THEN CHECK THAT STOCK IS BETWEEN BUY POINT AND FIVE PERCENT ABOVE
+    # IF CONDITIONS FULFILLED BUY STOCK
+
 
 def getLivePrice(stock):
     if stock == "KL.TO":
@@ -98,4 +139,5 @@ def checkCorrectionPercentage(stock, oldHighDate, high):
         percentageDifference = ((high - rangeLow)/high) * 100
         return percentageDifference
 
+checkBreakouts()
 compareHighs()

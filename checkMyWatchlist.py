@@ -20,7 +20,7 @@ except Error as e :
 cursor = mysql.cursor()
 
 def numberOfElements():
-    cursor.execute("select count(*) from myWatchlist")
+    cursor.execute("select COUNT (*) from myWatchlist")
     result = cursor.fetchall()
     for number in result:
         return number[0]

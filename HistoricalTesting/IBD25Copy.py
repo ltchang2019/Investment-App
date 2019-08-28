@@ -19,3 +19,6 @@ symbolList = ['COR', 'TTD', 'TEAM', 'PYPL', 'TRU', 'ANET', 'SUPV', 'ODFL', 'PETS
 
 
 print(symbolList, "\n")
+
+
+# 'TEAM', 'ANET', 'ALGN', 'THO', 'FOXF', 'CGNX', 'COHR', 'ALRM', 'BABA', 'YY', 'STMP', 'AEIS', 'AMAT', 'KEM', 'LRCX', 'NVDA', 'OLED', 'SINA'

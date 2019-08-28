@@ -82,9 +82,9 @@ def checkOldestDayNasdaq(todayDate):
         if daysBetween(datetime.strptime(oldDate, "%Y-%m-%d").date(), todayDate) >= 35:
             removeOldDistributionDay(oldDate)
             print("Distribution day removed. 35 days passed.")
-        elif (getNasdaqData.currSP500Price - oldPrice)/oldPrice >= .05:
+        elif (getNasdaqData.currSP500Price - oldPrice)/oldPrice >= .025:
             removeOldDistributionDay(oldDate)
-            print("Distribution day removed. Market climbed 5%.")
+            print("Distribution day removed. Market climbed 2.5%.")
     else:
         print("No distribution days in table")
 
@@ -93,10 +93,10 @@ def daysBetween(d1, d2):
     return difference
 
 def truncatePortfolioAndDistributionDays():
-    truncatePortfolio = "TRUNCATE TABLE portfolio"
+    # truncatePortfolio = "TRUNCATE TABLE portfolio"
     truncateSP500Distribution = "TRUNCATE TABLE SP500DistributionDays"
     truncateNasdaqDistribution = "TRUNCATE TABLE NasdaqDistributionDays"
-    mycursor.execute(truncatePortfolio)
+    # mycursor.execute(truncatePortfolio)
     mycursor.execute(truncateSP500Distribution)
     mycursor.execute(truncateNasdaqDistribution)
     mysql.commit()

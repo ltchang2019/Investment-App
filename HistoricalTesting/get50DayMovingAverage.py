@@ -3,10 +3,16 @@ from yahoo_fin import stock_info as si
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import mysql.connector
+from GetDateRangeCopy import todayDate
 
+
+# stock = "^GSPC"
 
 def get50DayMA(stock, todayDate):
     stockInfo = get_data(stock, start_date = todayDate + relativedelta(days=-70), end_date = todayDate)
     total = stockInfo['volume'].sum()
     average = total/50
+    print(average)
     return average
+
+# get50DayMA(stock, todayDate)

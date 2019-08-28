@@ -82,9 +82,9 @@ def checkOldestDaySP500(todayDate):
         if daysBetween(datetime.strptime(oldDate, "%Y-%m-%d").date(), todayDate) >= 35:
             removeOldDistributionDay(oldDate)
             print("Distribution day removed. 35 days passed.")
-        elif (getSP500Data.currSP500Price - oldPrice)/oldPrice >= .05:
+        elif (getSP500Data.currSP500Price - oldPrice)/oldPrice >= .025:
             removeOldDistributionDay(oldDate)
-            print("Distribution day removed. Market climbed 5%.")
+            print("Distribution day removed. Market climbed 2.5%.")
     else:
         print("No distribution days in table")
 

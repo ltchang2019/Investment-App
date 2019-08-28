@@ -16,7 +16,7 @@ mycursor = mysql.cursor(buffered=True)
 
 print("Retrieving date range...")
 global todayDate
-todayDate = "2015-10-06"
+todayDate = "2015-2-11"
 todayDate = datetime.strptime(todayDate, "%Y-%m-%d").date()
 
 def StartSP500PostFollowThrough():
@@ -26,10 +26,10 @@ def StartSP500PostFollowThrough():
         runAllPostFollowThrough()
     elif mycursor.rowcount == 3:
         print("3 post follow through days.")
-        schedule.clear()
+        # schedule.clear()
     elif mycursor.rowcount > 3:
         print("More than 3 post follow through days.")
-        schedule.clear()
+        # schedule.clear()
 
 def prev_weekday(adate):
     adate -= timedelta(days=1)
@@ -57,8 +57,7 @@ def runAllPostFollowThrough():
 
     todayDate = next_weekday(todayDate)
 
-
-schedule.every(3).seconds.do(StartSP500PostFollowThrough)
+schedule.every(5).seconds.do(StartSP500PostFollowThrough)
 while 1:
     schedule.run_pending()
     time.sleep(1)

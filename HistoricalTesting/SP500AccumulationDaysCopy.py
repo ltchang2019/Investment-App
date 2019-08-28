@@ -11,8 +11,7 @@ mysql = mysql.connector.connect(
     password = "",
     database = "HistoricalTesting"
 )
-mycursor = mysql.cursor()
-
+mycursor = mysql.cursor(buffered=True)
 sp500 = "^GSPC"
 # 1st Day: index closes above last session's price
 # 2nd & 3rd Days: low of 1st day is not undercut by new closes
@@ -62,13 +61,13 @@ def middleDays():
     result = mycursor.fetchall()
     firstClose = result[0][0]
     firstLow = result[0][1]
-    print(getSP500Data.currSP500Close)
+    print(getSP500Data.currSP500Close, "close")
 
     if getSP500Data.currSP500Close > firstLow:
-         if (getSP500Data.currSP500Close - getSP500Data.pastSP500Close)/getSP500Data.pastSP500Close <= .0125:
+         if (getSP500Data.currSP500Close - getSP500Data.pastSP500Close)/getSP500Data.pastSP500Close <= .01:
              addAccumulationDay()
              print("Middle day entered")
-         elif (getSP500Data.currSP500Close - getSP500Data.pastSP500Close)/getSP500Data.pastSP500Close >= .0125:
+         elif (getSP500Data.currSP500Close - getSP500Data.pastSP500Close)/getSP500Data.pastSP500Close >= .01:
             # check that you have at least 3 accumulation days
             sql = "SELECT * FROM SP500AccumulationDays WHERE dayNumber = %s"
             mycursor.execute(sql, (3,))
@@ -85,6 +84,23 @@ def middleDays():
         mycursor.execute(truncateNasdaqAccumulationDays)
         mysql.commit()
         print("Low undercut. Rally started over.")
+
+def resetSP500Rally():
+    sql = "SELECT dayNumber FROM SP500AccumulationDays ORDER BY dayNumber DESC LIMIT 1"
+    mycursor.execute(sql)
+    if mycursor.rowcount > 0:
+        result = mycursor.fetchall()[0][0]
+        if result > 7:
+            print("7 days passed. RESET RALLY.")
+            truncateSP500AccumulationDays = "TRUNCATE TABLE SP500AccumulationDays"
+            truncateNasdaqAccumulationDays = "TRUNCATE TABLE NasdaqAccumulationDays"
+            mycursor.execute(truncateSP500AccumulationDays)
+            mycursor.execute(truncateNasdaqAccumulationDays)
+            mysql.commit()
+        else:
+            print("Rally at day", result)
+    else:
+        print("No entries in SP500 accumulation")
 
 def followThroughDay():
     if getSP500Data.currSP500Volume > getSP500Data.pastSP500Volume:

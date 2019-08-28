@@ -7,7 +7,7 @@ import time
 
 print("Retrieving date range...")
 global todayDate
-todayDate = "2015-05-27"
+todayDate = "2015-4-7"
 todayDate = datetime.strptime(todayDate, "%Y-%m-%d").date()
 
 def prev_weekday(adate):
@@ -27,9 +27,11 @@ def runAllAccumulation():
     print(todayDate)
     # if inUptrend == True:
     print("SP500:")
+    # resetSP500Rally()
     getSP500Data(todayDate, prev_weekday(todayDate))
     startSP500Function()
     print("\nNasdaq:")
+    # resetNasdaqRally()
     getNasdaqData(todayDate, prev_weekday(todayDate))
     startNasdaqFunction()
     print("\n \n")
@@ -37,7 +39,7 @@ def runAllAccumulation():
     todayDate = next_weekday(todayDate)
 
 
-schedule.every(3).seconds.do(runAllAccumulation)
+schedule.every(5).seconds.do(runAllAccumulation)
 while 1:
     schedule.run_pending()
     time.sleep(1)

@@ -9,7 +9,7 @@ def prev_weekday(adate):
         adate -= timedelta(days=1)
     return adate
 
-todayDate = "2015-10-08"
+todayDate = "2018-5-16"
 todayDate = datetime.strptime(todayDate, "%Y-%m-%d").date()
 startDate = todayDate + relativedelta(months=-3)
 prevWeekday = prev_weekday(todayDate)

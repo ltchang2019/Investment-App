@@ -9,7 +9,7 @@ print("Retrieving relative highs and dates...")
 
 StockHighDateList = list()
 for stock in symbolList:
-    rangeData = get_data(stock , start_date = startDate , end_date = todayDate)
+    rangeData = get_data(stock, start_date = startDate, end_date = todayDate)
     highPriceData = rangeData.loc[rangeData['high'].idxmax()]
 
     highDate = highPriceData.name
